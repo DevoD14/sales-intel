@@ -1,15 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Props {
   onAnalyze: (transcript: string) => void;
+  onRecord: () => void;
   loading: boolean;
   error: string | null;
+  initialTranscript?: string;
 }
 
-export default function TranscriptForm({ onAnalyze, loading, error }: Props) {
-  const [transcript, setTranscript] = useState("");
+export default function TranscriptForm({ onAnalyze, onRecord, loading, error, initialTranscript }: Props) {
+  const [transcript, setTranscript] = useState(initialTranscript ?? "");
+
+  useEffect(() => {
+    if (initialTranscript) setTranscript(initialTranscript);
+  }, [initialTranscript]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -21,9 +27,30 @@ export default function TranscriptForm({ onAnalyze, loading, error }: Props) {
       <div>
         <h2 className="text-2xl font-semibold text-gray-900 mb-1">Analyze a Sales Call</h2>
         <p className="text-gray-500 text-sm">
-          Paste your call transcript or notes below. The AI will extract pipeline stage, win
-          probability, action items, and generate a Salesforce-ready export.
+          Record your call directly or paste existing notes and transcripts below.
         </p>
+      </div>
+
+      <button
+        type="button"
+        onClick={onRecord}
+        className="flex items-center gap-3 w-full rounded-xl border-2 border-dashed border-gray-300 px-5 py-4 text-sm font-medium text-gray-600 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 transition group"
+      >
+        <div className="w-8 h-8 rounded-full bg-red-100 group-hover:bg-red-200 flex items-center justify-center flex-shrink-0 transition">
+          <span className="w-3 h-3 rounded-full bg-red-500" />
+        </div>
+        <div className="text-left">
+          <p className="font-semibold">Record a Call</p>
+          <p className="text-xs text-gray-400 group-hover:text-blue-500 transition">
+            Capture audio and auto-generate a transcript in real time
+          </p>
+        </div>
+      </button>
+
+      <div className="flex items-center gap-3 text-xs text-gray-400">
+        <div className="flex-1 h-px bg-gray-200" />
+        <span>or paste transcript manually</span>
+        <div className="flex-1 h-px bg-gray-200" />
       </div>
 
       <div>
@@ -34,7 +61,7 @@ export default function TranscriptForm({ onAnalyze, loading, error }: Props) {
           id="transcript"
           value={transcript}
           onChange={(e) => setTranscript(e.target.value)}
-          rows={16}
+          rows={14}
           placeholder="Paste your sales call transcript or notes here..."
           className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
           disabled={loading}
